@@ -1,4 +1,4 @@
-resource "aws_instance" "web-server1" {
+resource "aws_instance" "web-server-1" {
   ami                    =  var.ami
   instance_type          =  var.instance_type_1
   vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
@@ -11,7 +11,7 @@ resource "aws_instance" "web-server1" {
   }
 }
 
-resource "aws_instance" "web-server1" {
+resource "aws_instance" "web-server-2" {
   ami                    =  var.ami
   instance_type          =  var.instance_type_2
   vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
