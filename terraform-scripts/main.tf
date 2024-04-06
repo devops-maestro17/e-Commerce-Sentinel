@@ -1,30 +1,3 @@
-resource "aws_instance" "web-server-1" {
-  ami                    =  var.ami
-  instance_type          =  var.instance_type_1
-  vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
-  user_data              = templatefile("./install-jenkins.sh", {})
-  tags = {
-    Name = "Jenkins-server"
-  }
-  root_block_device {
-    volume_size = var.volume_size_1
-  }
-}
-
-resource "aws_instance" "web-server-2" {
-  ami                    =  var.ami
-  instance_type          =  var.instance_type_2
-  vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
-  user_data              = templatefile("./install-sonarqube.sh", {})
-  tags = {
-    Name = "Jenkins-server"
-  }
-  root_block_device {
-    volume_size = var.volume_size_2
-  }
-}
-
-
 resource "aws_security_group" "sg" {
   name        = "sentinel-sg"
   description = "Allow TLS inbound traffic"
@@ -49,5 +22,31 @@ resource "aws_security_group" "sg" {
   }
   tags = {
     Name = "sentinel-sg"
+  }
+}
+
+resource "aws_instance" "web-server-1" {
+  ami                    =  var.ami
+  instance_type          =  var.instance_type_1
+  vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
+  user_data              = templatefile("./install-jenkins.sh", {})
+  tags = {
+    Name = "Jenkins-server"
+  }
+  root_block_device {
+    volume_size = var.volume_size_1
+  }
+}
+
+resource "aws_instance" "web-server-2" {
+  ami                    =  var.ami
+  instance_type          =  var.instance_type_2
+  vpc_security_group_ids = [aws_security_group.sentinel-sg.id]
+  user_data              = templatefile("./install-sonarqube.sh", {})
+  tags = {
+    Name = "Jenkins-server"
+  }
+  root_block_device {
+    volume_size = var.volume_size_2
   }
 }
