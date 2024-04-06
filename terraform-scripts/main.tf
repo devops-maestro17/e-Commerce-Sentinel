@@ -44,7 +44,7 @@ resource "aws_instance" "web-server-2" {
   vpc_security_group_ids = [aws_security_group.sg.id]
   user_data              = templatefile("./install-sonarqube.sh", {})
   tags = {
-    Name = "Jenkins-server"
+    Name = "Sonarqube-server"
   }
   root_block_device {
     volume_size = var.volume_size_2
