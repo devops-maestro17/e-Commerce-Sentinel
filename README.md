@@ -17,7 +17,7 @@ The Continuous Deployment (CD) stage leveraged ArgoCD, a declarative continuous 
 Additionally, monitoring and observability were established using Prometheus and Grafana. Prometheus was configured to collect metrics from both the Jenkins server and the EKS clusters, enabling the identification of potential performance bottlenecks through Grafana visualizations.
 
 ## Prerequisites
-Before proceeding, ensure to have an AWS account where we will be performing all the setup and configuration and it might incur some costs.
+Before proceeding, ensure to have an AWS account where we will be performing all the setup and configuration and it might incur some costs. Also make sure to have a DockerHub account which will be used to host Docker images later in this project.
 
 ## Installing Terraform on AWS CloudShell
 In this project, Terraform is used to create the servers for Jenkins and SonarQube and install the required tools. To install Terraform, activate the AWS CloudShell and follow the below steps:
@@ -114,4 +114,167 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo chmod 777 /var/run/docker.sock
 docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ```
+
+## Terraform setup
+
+### Initialize Terraform
+```bash
+terraform init
+```
+
+### Review the execution plan
+```bash
+terraform plan
+```
+
+### Apply the Terraform configuration to create the required resources
+```bash
+terraform apply
+# Enter "Yes" on the prompt
+```
+
+<img width="705" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f00f0826-2a44-43b6-9d39-2d210ccef908">
+
+
+Verify the creation of the servers by navigating to the EC2 instance section in AWS Console. Connect to the Jenkins server using EC2 Instance Connect feature
+
+## Jenkins Setup
+To verify whether jenkins is running:
+```bash
+sudo systemctl status jenkins
+```
+<img width="932" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/a850c3f0-4a04-41ff-b696-80452cd1b357">
+
+
+By default, Jenkins can be accessed on port 8080, so copy the instance IP address and hit the URL `http://<ip-address>:<port>` to open Jenkins.
+To fetch the Jenkins password, run the below command in Jenkins server:
+
+```bash
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+Enter the password and then click in "Install suggested plugins"
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/64850be4-20cd-49c5-8be1-1b1b06f24222">
+
+
+Create an user, provide all the details and the Jenkins dashboard will show up like this
+
+<img width="957" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/582e10be-c419-4785-b90a-90ab6dd4a663">
+
+
+## Install Plugins for the CI/CD Pipeline
+Go to Manage Jenkins -> Plugins -> Available Plugins
+
+And, install the below plugins
+- Eclipse Temurin Installer
+- SonarQube Scanner
+- NodeJs Plugin
+- Email Extension Template
+- OWASP Dependency Check
+- Docker
+- Docker commons
+- Docker Pipeline
+- Docker API
+- Prometheus metrics
+
+<img width="959" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/b93ff47b-ab59-42a7-8372-1c2b44ab7b4d">
+
+
+
+## Configuring the Tools in Jenkins
+Navigate to  Manage Jenkins -> Tools and install JDK, NodeJS, SonarQube scanner, Docker and OWASP by referring to the following screenshots
+
+#### JDK17
+<img width="922" alt="jdk-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/194a1c07-c243-4568-9fa4-ff7c0be03855">
+
+
+### NodeJS
+<img width="932" alt="nodejs-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/400c6b73-3707-47a4-9deb-909b1c7f130f">
+
+
+### SonarQube Scanner
+<img width="872" alt="sonar-scanner-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/329a5f90-743e-42eb-af27-0685dbe7a397">
+
+
+### Docker
+<img width="896" alt="docker-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/2cc12960-3459-4ada-b9e0-efe6f844ad51">
+
+
+### OWASP
+<img width="896" alt="owasp-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/47535d11-aa2e-40c1-978d-51ac5e8fc179">
+
+
+## SonarQube Setup
+
+Connect to the SonarQube server by using EC2 instance connect and run the below command to verify sonarqube is running or not
+
+```bash
+docker ps
+```
+
+<img width="918" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/9c5db047-2d8d-42ed-b8a3-75f6f1004e7f">
+
+
+Now, navigate to the URL `http:<public-ip-address-of-sonarqube-server>:9000` to access the SonarQube dashboard. Login by providing username: `admin` and password: `admin` and on the next window, provide a new password
+
+<img width="959" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/0913f34a-e0f2-46f6-b06c-a19aaa4b4597">
+
+
+
+Now goto Sonarqube Server. Click on Administration -> Security -> Users -> Click on Tokens and Update Token -> Give it a name -> and click on Generate Token
+
+<img width="959" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/27216c90-ba8d-421d-b62d-380222ae410d">
+
+
+<img width="955" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/8cb778ca-7994-4688-9b31-c510076d7ad2">
+
+
+
+Copy the token and go to Jenkins Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials(unrestricted) -> Add Credential -> Secret Text. Paste the token and put the ID as `sonar-token` and click on Save
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/b5e0a8ea-4648-4d1d-aa5f-db766ac5c6fa">
+
+
+
+Now go to Jenkins Dashboard → Manage Jenkins → System -> Add SonarQube and add the SonarQube server as shown below:
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/7daae398-5e35-4f39-81d2-70e37ef70b7b">
+
+
+
+Click on Apply and Save
+
+### Adding WebHook in SonarQube for Quality Gate configuration
+
+In the SonarQube dashboard, navigate to Administration –> Configuration –> Webhooks -> Click on Create and provide the below details:
+
+- Name: `jenkins `
+- URL: `<http://jenkins-public-ip:8080>/sonarqube-webhook/`
+
+Click on Create. This will create a webhook to notify Jenkins once the sonarqube analysis is completed.
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f8590615-75a7-4b0c-a3bc-d2145c8dc90c">
+
+
+
+## Adding DockerHub credentials in Jenkins
+Go to Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials (unrestricted) -> Add Credentials -> Username with password and provide the DockerHub credentials with the ID as `docker`
+
+<img width="816" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/1d94b04c-0563-49ff-8f8b-376484120115">
+
+
+
+## Setting up the CI pipeline
+
+The steps for the pipeline are present in the JenkinsFile. The file contains the pipeline configuration as shown below:
+
+
+
+
+
+
+
+
+
+
 
