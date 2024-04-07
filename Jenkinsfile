@@ -18,21 +18,21 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
             }
         }
-        // stage("Sonarqube Analysis "){
-        //     steps{
-        //         withSonarQubeEnv('sonar-server') {
-        //             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
-        //             -Dsonar.projectKey=AmazonClone '''
-        //         }
-        //     }
-        // }
-        // stage("quality gate"){
-        //    steps {
-        //         script {
-        //             waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
-        //         }
-        //     }
-        // }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
+                    -Dsonar.projectKey=AmazonClone '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
@@ -41,7 +41,7 @@ pipeline{
 
         stage('OWASP Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey 9452d758-d7654e59-a36c-7f2dc3c5d230' , odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey <your-api-key>' , odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
