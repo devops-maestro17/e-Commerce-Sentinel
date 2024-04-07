@@ -266,7 +266,89 @@ Go to Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials
 
 ## Setting up the CI pipeline
 
+Go to Jenkins dashboard and create a New Job.
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/696fb7b5-c35f-461c-b70c-4a353681b1bb">
+
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/09e59e4f-38cb-4cbe-87d6-f10201ce2cbe">
+
+
 The steps for the pipeline are present in the JenkinsFile. The file contains the pipeline configuration as shown below:
+
+```bash
+pipeline{
+    agent any
+    tools{
+        jdk 'jdk17'
+        nodejs 'nodejs16'
+    }
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+    stages {
+        stage('Clean Workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
+            }
+        }
+        stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('sonar-server') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
+                    -Dsonar.projectKey=AmazonClone '''
+                }
+            }
+        }
+        stage("quality gate"){
+           steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('TRIVY File System Scan') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+
+        stage("Docker Build & Push"){
+            steps{
+                script{
+                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                       sh "docker build -t amazon-clone ."
+                       sh "docker tag amazon containerizeops/amazon-clone:latest "
+                       sh "docker push containerizeops/amazon-clone:latest "
+                    }
+                }
+            }
+        }
+        stage("TRIVY Image Scan"){
+            steps{
+                sh "trivy image containerizeops/amazon-clone:latest > trivyimage.txt"
+            }
+        }
+    }
+}
+```
 
 
 
