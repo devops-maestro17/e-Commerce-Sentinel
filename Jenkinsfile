@@ -56,7 +56,7 @@ pipeline{
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                        sh "docker build -t amazon-clone ."
-                       sh "docker tag amazon containerizeops/amazon-clone:latest "
+                       sh "docker tag amazon-clone containerizeops/amazon-clone:latest "
                        sh "docker push containerizeops/amazon-clone:latest "
                     }
                 }
