@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amazon-clone-app
+  labels:
+    app: amazon-clone-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: amazon-clone-app
+  template:
+    metadata:
+      labels:
+        app: amazon-clone-app
+    spec:
+      containers:
+      - name: amazon-clone-app
+        image: containerizeops/amazon-clone:replaceImageTag
+        ports:
+        - containerPort: 3000

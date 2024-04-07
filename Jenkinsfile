@@ -13,11 +13,13 @@ pipeline{
                 cleanWs()
             }
         }
+
         stage('Checkout from Git'){
             steps{
                 git branch: 'main', url: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
             }
         }
+
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-server') {
@@ -26,6 +28,7 @@ pipeline{
                 }
             }
         }
+
         stage("quality gate"){
            steps {
                 script {
@@ -33,6 +36,7 @@ pipeline{
                 }
             }
         }
+
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
@@ -62,9 +66,29 @@ pipeline{
                 }
             }
         }
+
         stage("TRIVY Image Scan"){
             steps{
                 sh "trivy image containerizeops/amazon-clone:latest > trivyimage.txt"
+            }
+        }
+
+        stage("Update Deployment manifest"){
+            environment {
+            GIT_REPO_NAME = "e-Commerce-Sentinel"
+            GIT_USER_NAME = "devops-maestro17"
+        }
+        steps {
+            withCredentials([string(credentialsId: 'github', variable: 'github-token')]) {
+                sh '''
+                    git config user.email "rajdeep_deogharia@outlook.com"
+                    git config user.name "devops-maestro17"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" k8s-manifests/deployment.yml
+                    git add k8s-manifests/deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
         }
     }
