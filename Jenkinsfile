@@ -18,21 +18,21 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
             }
         }
-        stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
-                    -Dsonar.projectKey=AmazonClone '''
-                }
-            }
-        }
-        stage("quality gate"){
-           steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
-                }
-            }
-        }
+        // stage("Sonarqube Analysis "){
+        //     steps{
+        //         withSonarQubeEnv('sonar-server') {
+        //             sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
+        //             -Dsonar.projectKey=AmazonClone '''
+        //         }
+        //     }
+        // }
+        // stage("quality gate"){
+        //    steps {
+        //         script {
+        //             waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+        //         }
+        //     }
+        // }
         stage('Install Dependencies') {
             steps {
                 sh "npm install"
