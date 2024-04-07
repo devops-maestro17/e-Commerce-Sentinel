@@ -266,9 +266,11 @@ Go to Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials
 
 ## Setting up the CI pipeline
 
-Go to Jenkins dashboard and create a New Job.
+Go to Jenkins dashboard and create a New Pipeline.
 
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/696fb7b5-c35f-461c-b70c-4a353681b1bb">
+
+
 
 
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/09e59e4f-38cb-4cbe-87d6-f10201ce2cbe">
