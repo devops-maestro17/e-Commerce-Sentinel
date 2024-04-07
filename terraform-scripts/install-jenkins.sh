@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Install Docker
-
 sudo apt-get update
 sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -14,6 +13,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+sudo chmod 777 /var/run/docker.sock
 
 # Install Jenkins
 sudo apt update
