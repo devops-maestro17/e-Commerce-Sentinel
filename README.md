@@ -313,11 +313,15 @@ Go to Jenkins dashboard and create a New Pipeline. In the Pipeline Configuration
 
 
 
+
 Go to Blue Ocean from Jenkins Dashboard and Run the pipeline. The final CI pipeline looks as follows:
 
-![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/92fc7660-3c9e-4509-8eed-a79e5b956619)
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f9ce1b33-5754-44a5-82b8-a7833e440d59)
 
 
+Mail Notification:
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/38cbb7da-98fa-402f-b5c0-cd6c52eb43d1)
 
 
 
