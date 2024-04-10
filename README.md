@@ -280,6 +280,16 @@ To add Snyk authentication token, create an account in Snyk by navigating to htt
 
 Now go to Jenkins Global Credentials, add the Github credential with the ID as `github-token` and Snyk token with the ID as `snyk-token` both in the form of Secret Text.
 
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f8bfa4b6-a474-4d52-916e-34caea760b8b)
+
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/752e892f-ed0f-4994-8cb3-c2677c62377e)
+
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/97d66341-4bd8-4d3c-830e-c7eb942a914d)
+
+
 ## Setting up the CI pipeline
 
 Go to Jenkins dashboard and create a New Pipeline.
