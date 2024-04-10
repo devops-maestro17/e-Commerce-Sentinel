@@ -366,8 +366,108 @@ Verify the installation by using
 eksctl version
 ```
 
+
 <img width="829" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/47662b8a-44db-438b-bf54-b1411975f6e2">
 
 
 
+Create the cluster by using the below command
+```bash
+eksctl create cluster --name=my-cluster --region=ap-south-1 --zones=ap-south-1a,ap-south-1b --node-type=t3.medium --nodes=3
+```
+
+
+<img width="935" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/ea97c01e-bd15-43f1-8171-c061268d5fca">
+
+
+
+## Install ArgoCD in the EKS cluster
+
+Once the cluster is created, it's time to set up ArgoCD
+
+```bash
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+Check whether the ArgoCD pods are up by using `kubectl get pods -n argocd`
+
+<img width="539" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/8499da62-c3cf-4d0e-a4c9-d0d428f66897">
+
+
+Now change the service type of the ArgoCD Server to Load Balancer by using the below command
+
+```bash
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
+To verify whether the service type has changed, use `kubectl get svc -n argocd`
+
+<img width="928" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/94557e6e-e3be-47ba-b0d7-e378b65b1656">
+
+
+
+Now hit the Load Balancer IP address in a new tab to access the ArgoCD UI.
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/5bca167c-6a22-4f1d-8c1d-b5bf3796ba23">
+
+
+
+
+To fetch the ArgoCD password, copy the value from `data.password` by running the below command
+
+```bash
+kubectl edit secret argocd-initial-admin-secret -n argocd
+```
+
+Now to decode the password, use
+
+```bash
+echo <password> | base64 --decode
+```
+
+Enter the username as `admin` and the password to enter the ArgoCD dashboard
+
+## Create an ArgoCD Application
+
+To create an ArgoCD application, click on New App > Edit as YAML and paste the below code. (This can also be created using kubectl apply command but we need to install ArgoCD CLI)
+
+```bash
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: amazon-clone-app
+spec:
+  destination:
+    namespace: dev
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: k8s-manifests
+    repoURL: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+Click on Save > Create. This should start deploying the Amazon-Clone application to the Kubernetes (EKS) cluster
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/6db191a9-f2c7-4c21-ae26-9bf465f6e28c">
+
+
+
+To verify whether the pods and services are running, use `kubectl get all -n dev`
+
+<img width="853" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/1308ebae-f542-4d10-b690-0a67fb088cf6">
+
+
+
+Fetch the Load balancer IP address to access the Amazon Clone application
+
+<img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/8542fc27-66fa-49a6-bf40-991799b2be76">
 
