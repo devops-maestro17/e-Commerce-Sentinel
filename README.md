@@ -6,7 +6,7 @@ The project involved the implementation of a comprehensive CI/CD pipeline for de
 In the CI stage, several security and quality checks were performed, including:
 
 - Static code analysis using SonarQube to identify code quality issues and vulnerabilities.
-- OWASP dependency check to scan for known vulnerabilities in third-party dependencies.
+- Snyk dependency check to scan for known vulnerabilities in third-party dependencies.
 - File scan using Trivy to detect vulnerabilities in application files.
 - Building a Docker image and scanning it with Trivy to identify vulnerabilities in the container image.
 
@@ -170,19 +170,21 @@ And, install the below plugins
 - SonarQube Scanner
 - NodeJs Plugin
 - Email Extension Template
-- OWASP Dependency Check
+- Snyk
 - Docker
 - Docker commons
 - Docker Pipeline
 - Docker API
 - Prometheus metrics
+- Blue Ocean
 
 <img width="959" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/b93ff47b-ab59-42a7-8372-1c2b44ab7b4d">
 
 
 
 ## Configuring the Tools in Jenkins
-Navigate to  Manage Jenkins -> Tools and install JDK, NodeJS, SonarQube scanner, Docker and OWASP by referring to the following screenshots
+
+Navigate to  Manage Jenkins -> Tools and install JDK, NodeJS, SonarQube scanner, Docker and Snyk by referring to the following screenshots
 
 #### JDK17
 <img width="922" alt="jdk-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/194a1c07-c243-4568-9fa4-ff7c0be03855">
@@ -200,8 +202,8 @@ Navigate to  Manage Jenkins -> Tools and install JDK, NodeJS, SonarQube scanner,
 <img width="896" alt="docker-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/2cc12960-3459-4ada-b9e0-efe6f844ad51">
 
 
-### OWASP
-<img width="896" alt="owasp-tool-install" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/47535d11-aa2e-40c1-978d-51ac5e8fc179">
+### Snyk
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/5307bdbd-8e1b-4fdb-832c-55d9b50df095)
 
 
 ## SonarQube Setup
@@ -257,7 +259,8 @@ Click on Create. This will create a webhook to notify Jenkins once the sonarqube
 
 
 
-## Adding DockerHub and GitHub credentials in Jenkins
+## Adding DockerHub, Snyk and GitHub credentials in Jenkins
+
 Go to Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials (unrestricted) -> Add Credentials -> Username with password and provide the DockerHub credentials with the ID as `docker`
 
 <img width="816" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/1d94b04c-0563-49ff-8f8b-376484120115">
@@ -268,7 +271,14 @@ In order to add GitHub credentials, create a Personal Access Token by navigating
 ![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/59c2371b-7592-470b-9f18-7dc94da735b9)
 
 
-Now go to Jenkins Credentials, create a secret text and add the Github credential with the ID as `github-token`.
+
+To add Snyk authentication token, create an account in Snyk by navigating to https://app.snyk.io. Navigate to Account Settings and generate a new Auth Token so that Jenkins can use this token to communicate with Snyk.
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f349709e-302d-4ac5-90f0-cde9b635106d)
+
+
+
+Now go to Jenkins Global Credentials, add the Github credential with the ID as `github-token` and Snyk token with the ID as `snyk-token` both in the form of Secret Text.
 
 ## Setting up the CI pipeline
 
@@ -282,104 +292,7 @@ Go to Jenkins dashboard and create a New Pipeline.
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/09e59e4f-38cb-4cbe-87d6-f10201ce2cbe">
 
 
-The steps for the pipeline are present in the `Jenkinsfile`. The file contains the pipeline configuration as shown below:
-
-```bash
-
-pipeline{
-    agent any
-    tools{
-        jdk 'jdk17'
-        nodejs 'nodejs16'
-    }
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
-    }
-    stages {
-        stage('Clean Workspace'){
-            steps{
-                cleanWs()
-            }
-        }
-        stage('Checkout from Git'){
-            steps{
-                git branch: 'main', url: 'https://github.com/devops-maestro17/e-Commerce-Sentinel.git'
-            }
-        }
-        stage("Sonarqube Analysis "){
-            steps{
-                withSonarQubeEnv('sonar-server') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=AmazonClone \
-                    -Dsonar.projectKey=AmazonClone '''
-                }
-            }
-        }
-        stage("quality gate"){
-          steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
-                }
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh "npm install"
-            }
-        }
-
-        stage('OWASP Dependency Check') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey <your-api-key>' , odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-        stage('TRIVY File System Scan') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
-            }
-        }
-
-        stage("Docker Build & Push"){
-            steps{
-                script{
-                  withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                      sh "docker build -t amazon-clone ."
-                      sh "docker tag amazon-clone containerizeops/amazon-clone:1.0 "
-                      sh "docker push containerizeops/amazon-clone:1.0 "
-                    }
-                }
-            }
-        }
-        stage("TRIVY Image Scan"){
-            steps{
-                sh "trivy image containerizeops/amazon-clone:1.0 > trivyimage.txt"
-            }
-        }
-        
-        stage("Update Deployment manifest"){
-            environment {
-            GIT_REPO_NAME = "e-Commerce-Sentinel"
-            GIT_USER_NAME = "devops-maestro17"
-        }
-        steps {
-            withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "rajdeep_deogharia@outlook.com"
-                    git config user.name "devops-maestro17"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" k8s-manifests/deployment.yml
-                    git add k8s-manifests/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                '''
-            }
-        }
-    }
-    }
-}
-
-
-```
+The steps for the pipeline are present in the `Jenkinsfile`.
 
 
 
