@@ -280,12 +280,22 @@ To add Snyk authentication token, create an account in Snyk by navigating to htt
 
 Now go to Jenkins Global Credentials, add the Github credential with the ID as `github-token` and Snyk token with the ID as `snyk-token` both in the form of Secret Text.
 
+## Setting up Email Notification in Jenkins
+
+To set up Email Notification in Jenkins setup a Gmail account and store the App Password securely as it will be used to authenticate with Jenkins. 
+Navigate to Manage Jenkins -> System -> Extended Email Notification and provide the following details:
+- SMTP Server: `smtp.gmail.com`
+- SMTP Port: 465
+- Under Advanced section, provide the Gmail credentials (email & App password) as shown below and enable `Use SSL` option
 
 ![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/f8bfa4b6-a474-4d52-916e-34caea760b8b)
 
 
+
 ![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/752e892f-ed0f-4994-8cb3-c2677c62377e)
 
+
+Provide the username and app password details again in the Email Notification section and enable `Use SSL` option
 
 ![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/97d66341-4bd8-4d3c-830e-c7eb942a914d)
 
