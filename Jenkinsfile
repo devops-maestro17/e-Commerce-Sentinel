@@ -73,8 +73,8 @@ pipeline{
                 script{
                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
                       sh "docker build -t amazon-clone ."
-                      sh "docker tag amazon-clone containerizeops/amazon-clone:1.0 "
-                      sh "docker push containerizeops/amazon-clone:1.0 "
+                      sh "docker tag amazon-clone containerizeops/amazon-clone:1.1 "
+                      sh "docker push containerizeops/amazon-clone:1.1 "
                     }
                 }
             }
@@ -82,7 +82,7 @@ pipeline{
         
         stage("Trivy Image Scan"){
             steps{
-                sh "trivy image containerizeops/amazon-clone:1.0 > trivy-image-report.txt"
+                sh "trivy image containerizeops/amazon-clone:1.1 > trivy-image-report.txt"
             }
         }
         
