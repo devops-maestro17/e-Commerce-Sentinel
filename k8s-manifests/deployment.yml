@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: amazon-clone-app
-        image: containerizeops/amazon-clone:31
+        image: containerizeops/amazon-clone:1.3
         ports:
         - containerPort: 3000
