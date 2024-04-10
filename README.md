@@ -302,7 +302,7 @@ Provide the username and app password details again in the Email Notification se
 
 ## Setting up the CI pipeline
 
-Go to Jenkins dashboard and create a New Pipeline.
+Go to Jenkins dashboard and create a New Pipeline. In the Pipeline Configuration, choose the Pipeline Defintion as `Pipeline Script from SCM`, SCM as `Git`, provide the Repository URL, set the Branch Specifier as `main` and click on Save.
 
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/696fb7b5-c35f-461c-b70c-4a353681b1bb">
 
@@ -312,8 +312,7 @@ Go to Jenkins dashboard and create a New Pipeline.
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/09e59e4f-38cb-4cbe-87d6-f10201ce2cbe">
 
 
-The steps for the pipeline are present in the `Jenkinsfile`.
-
+Go to Blue Ocean from Jenkins Dashboard and Run the pipeline
 
 
 
