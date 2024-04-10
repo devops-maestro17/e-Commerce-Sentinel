@@ -257,12 +257,18 @@ Click on Create. This will create a webhook to notify Jenkins once the sonarqube
 
 
 
-## Adding DockerHub credentials in Jenkins
+## Adding DockerHub and GitHub credentials in Jenkins
 Go to Dashboard -> Manage Jenkins -> Credentials -> System -> Global credentials (unrestricted) -> Add Credentials -> Username with password and provide the DockerHub credentials with the ID as `docker`
 
 <img width="816" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/1d94b04c-0563-49ff-8f8b-376484120115">
 
 
+In order to add GitHub credentials, create a Personal Access Token by navigating to Github Settings -> Developer Settings -> Personal Access Tokens -> Tokens (Classic) -> Generate New Token. Create a new token and provide Repo Access permissions.
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/59c2371b-7592-470b-9f18-7dc94da735b9)
+
+
+Now go to Jenkins Credentials, create a secret text and add the Github credential with the ID as `github-token`.
 
 ## Setting up the CI pipeline
 
@@ -276,9 +282,10 @@ Go to Jenkins dashboard and create a New Pipeline.
 <img width="960" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/09e59e4f-38cb-4cbe-87d6-f10201ce2cbe">
 
 
-The steps for the pipeline are present in the JenkinsFile. The file contains the pipeline configuration as shown below:
+The steps for the pipeline are present in the `Jenkinsfile`. The file contains the pipeline configuration as shown below:
 
 ```bash
+
 pipeline{
     agent any
     tools{
@@ -308,7 +315,7 @@ pipeline{
             }
         }
         stage("quality gate"){
-           steps {
+          steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
                 }
@@ -322,7 +329,7 @@ pipeline{
 
         stage('OWASP Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --nvdApiKey <your-api-key>' , odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -335,21 +342,43 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh "docker build -t amazon-clone ."
-                       sh "docker tag amazon containerizeops/amazon-clone:latest "
-                       sh "docker push containerizeops/amazon-clone:latest "
+                  withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
+                      sh "docker build -t amazon-clone ."
+                      sh "docker tag amazon-clone containerizeops/amazon-clone:1.0 "
+                      sh "docker push containerizeops/amazon-clone:1.0 "
                     }
                 }
             }
         }
         stage("TRIVY Image Scan"){
             steps{
-                sh "trivy image containerizeops/amazon-clone:latest > trivyimage.txt"
+                sh "trivy image containerizeops/amazon-clone:1.0 > trivyimage.txt"
+            }
+        }
+        
+        stage("Update Deployment manifest"){
+            environment {
+            GIT_REPO_NAME = "e-Commerce-Sentinel"
+            GIT_USER_NAME = "devops-maestro17"
+        }
+        steps {
+            withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                sh '''
+                    git config user.email "rajdeep_deogharia@outlook.com"
+                    git config user.name "devops-maestro17"
+                    BUILD_NUMBER=${BUILD_NUMBER}
+                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" k8s-manifests/deployment.yml
+                    git add k8s-manifests/deployment.yml
+                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                '''
             }
         }
     }
+    }
 }
+
+
 ```
 
 
