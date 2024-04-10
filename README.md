@@ -325,6 +325,30 @@ Mail Notification:
 
 
 
+SonarQube Report:
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/1490c29e-c052-4669-b5fe-dd83bab20e54)
+
+
+
+
+Snyk Dependency Check Report:
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/5ef9de11-c32d-4143-a45c-4f1e0d829e46)
+
+
+
+
+Trivy File Scan Report:
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/cd56b762-984f-45bf-82c0-201990641866)
+
+
+
+
+Trivy Image Scan Report:
+
+![image](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/824d9dec-1cf2-4ce9-9585-a1ce3534957a)
 
 
 
