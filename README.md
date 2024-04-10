@@ -352,6 +352,22 @@ Trivy Image Scan Report:
 
 
 
+## Creating EKS cluster
+
+To create an EKS cluster, use the below commands in CloudShell
+
+```bash
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+```
+
+Verify the installation by using
+```bash
+eksctl version
+```
+
+<img width="829" alt="image" src="https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/47662b8a-44db-438b-bf54-b1411975f6e2">
+
 
 
 
