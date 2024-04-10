@@ -11,4 +11,4 @@ spec:
     targetPort: 3000
     protocol: TCP
   selector:
-    app: samazon-clone-app
+    app: amazon-clone-app
