@@ -1,4 +1,4 @@
-# DevSecOps Project to setup Amazon clone on AWS using CICD, Security and GitOps
+# DevSecOps CI/CD Pipeline to setup Amazon clone on AWS
 
 ## Overview
 The project involved the implementation of a comprehensive CI/CD pipeline for deploying an Amazon clone application to an Elastic Kubernetes Service (EKS) cluster, following DevSecOps best practices. The infrastructure was provisioned using Terraform, and Jenkins was utilized as the Continuous Integration (CI) tool.
