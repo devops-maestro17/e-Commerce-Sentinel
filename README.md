@@ -1,4 +1,4 @@
-# DevSecOps Project to setup Amazon clone on AWS using CICD, Security, Monitoring and GitOps
+# DevSecOps Project to setup Amazon clone on AWS using CICD, Security and GitOps
 
 ## Overview
 The project involved the implementation of a comprehensive CI/CD pipeline for deploying an Amazon clone application to an Elastic Kubernetes Service (EKS) cluster, following DevSecOps best practices. The infrastructure was provisioned using Terraform, and Jenkins was utilized as the Continuous Integration (CI) tool.
@@ -13,8 +13,6 @@ In the CI stage, several security and quality checks were performed, including:
 After successful completion of the security checks, the Docker image was pushed to Docker Hub. Shell scripts were employed to update the Kubernetes manifests with the latest image tag.
 
 The Continuous Deployment (CD) stage leveraged ArgoCD, a declarative continuous delivery tool, to automatically deploy the updated application to the EKS cluster. ArgoCD monitors the specified Git repository for changes and applies the updated manifests to the target EKS cluster.
-
-Additionally, monitoring and observability were established using Prometheus and Grafana. Prometheus was configured to collect metrics from both the Jenkins server and the EKS clusters, enabling the identification of potential performance bottlenecks through Grafana visualizations.
 
 ## Prerequisites
 Before proceeding, ensure to have an AWS account where we will be performing all the setup and configuration and it might incur some costs. Also make sure to have a DockerHub account which will be used to host Docker images later in this project.
