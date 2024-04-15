@@ -1,5 +1,8 @@
 # DevSecOps CI/CD Pipeline to setup Amazon clone on AWS
 
+![diagram-export-4-15-2024-8_22_15-PM](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/749a3e49-0a70-40f2-b6b4-f8967a5f4f9f)
+
+
 ## Overview
 The project involved the implementation of a comprehensive CI/CD pipeline for deploying an Amazon clone application to an Elastic Kubernetes Service (EKS) cluster, following DevSecOps best practices. The infrastructure was provisioned using Terraform, and Jenkins was utilized as the Continuous Integration (CI) tool.
 
