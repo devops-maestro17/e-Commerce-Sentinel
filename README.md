@@ -1,4 +1,4 @@
-# DevSecOps CI/CD Pipeline to deploy Amazon clone application on AWS
+# DevSecOps CI/CD Pipeline to deploy Amazon clone application on AWS Elastic Kubernetes Service (EKS)
 
 ![diagram-export-4-15-2024-8_22_15-PM](https://github.com/devops-maestro17/e-Commerce-Sentinel/assets/148553140/749a3e49-0a70-40f2-b6b4-f8967a5f4f9f)
 
