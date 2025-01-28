@@ -42,29 +42,35 @@ pipeline{
                 }
             }
         }
-        
-        stage('Install Dependencies') {
-            steps {
-                sh "npm install"
+
+        stage('Dependencies') {
+            parallel {
+                stage('Install Dependencies') {
+                    steps {
+                        sh "npm install"
+                    }
+                }
+                stage('Snyk CLI Install'){
+                    steps{
+                        sh 'npm install -g snyk'
+                    }
+                }
             }
         }
 
-        stage('Snyk CLI Install'){
-            steps{
-                sh 'npm install -g snyk'
-            }
-        }
-        
-        stage('Snyk Dependency Check'){
-            steps{
-                sh 'snyk test --severity-threshold=critical --fail-on=upgradable \
-                --json-file-output=dependency-check.json'
-            }
-        }
-        
-        stage('Trivy File System Scan') {
-            steps {
-                sh "trivy fs . > trivy-file-scan-report.txt"
+        stage('Dependencies') {
+            parallel {
+                stage('Snyk Dependency Check'){
+                    steps{
+                        sh 'snyk test --severity-threshold=critical --fail-on=upgradable \
+                        --json-file-output=dependency-check.json'
+                    }
+                }
+                stage('Trivy File System Scan') {
+                    steps {
+                        sh "trivy fs . > trivy-file-scan-report.txt"
+                    }
+                }
             }
         }
 
